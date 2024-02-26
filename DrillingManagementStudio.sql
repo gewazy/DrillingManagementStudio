@@ -1,6 +1,6 @@
 USE [u_dojurkow]
 GO
-/****** Object:  Table [dbo].[Attendance]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Attendance]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -16,7 +16,7 @@ CREATE TABLE [dbo].[Attendance](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Drillers]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Drillers]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -33,7 +33,7 @@ CREATE TABLE [dbo].[Drillers](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  View [dbo].[VM_attendance_report]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  View [dbo].[VM_attendance_report]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -60,7 +60,7 @@ FROM (
 		FOR day IN ([1], [2], [3], [4], [5], [6], [7], [8] , [9], [10], [11], [12], [13], [14], [15], [16], [17], [18], [19], [20], [21], [22], [23], [24], [25], [26], [27], [28], [29], [30], [31])
 	) AS attendance_report;
 GO
-/****** Object:  Table [dbo].[Boreholes]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Boreholes]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -89,7 +89,7 @@ CREATE TABLE [dbo].[Boreholes](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Failures]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Failures]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -108,7 +108,7 @@ CREATE TABLE [dbo].[Failures](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Fuel]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Fuel]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -124,7 +124,7 @@ CREATE TABLE [dbo].[Fuel](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[InUse]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[InUse]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -141,7 +141,7 @@ CREATE TABLE [dbo].[InUse](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Plan]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Plan]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -160,7 +160,7 @@ CREATE TABLE [dbo].[Plan](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[PositionDetails]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[PositionDetails]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -177,7 +177,7 @@ CREATE TABLE [dbo].[PositionDetails](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Positions]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Positions]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -195,7 +195,23 @@ CREATE TABLE [dbo].[Positions](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Rigs]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Removal]    Script Date: 26.02.2024 18:22:34 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[Removal](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[BH_id] [int] NOT NULL,
+	[team_id] [int] NOT NULL,
+	[date] [nchar](10) NOT NULL,
+ CONSTRAINT [PK_Removal] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Rigs]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -212,14 +228,14 @@ CREATE TABLE [dbo].[Rigs](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Teams]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Teams]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[Teams](
 	[id] [int] IDENTITY(1,1) NOT NULL,
-	[device_id] [int] NULL,
+	[leader_id] [int] NOT NULL,
 	[start_date] [date] NOT NULL,
 	[end_date] [date] NULL,
  CONSTRAINT [PK_Teans] PRIMARY KEY CLUSTERED 
@@ -228,7 +244,7 @@ CREATE TABLE [dbo].[Teams](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Theory]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Theory]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -246,7 +262,7 @@ CREATE TABLE [dbo].[Theory](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Types]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[Types]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -264,7 +280,7 @@ CREATE TABLE [dbo].[Types](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[WorkHours]    Script Date: 26.02.2024 15:34:42 ******/
+/****** Object:  Table [dbo].[WorkHours]    Script Date: 26.02.2024 18:22:34 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -301,6 +317,8 @@ GO
 ALTER TABLE [dbo].[Plan] ADD  CONSTRAINT [DF_Plan_canceled]  DEFAULT ((0)) FOR [canceled]
 GO
 ALTER TABLE [dbo].[PositionDetails] ADD  CONSTRAINT [DF_PositionDetails_date_from]  DEFAULT (CONVERT([date],getdate())) FOR [date_from]
+GO
+ALTER TABLE [dbo].[Removal] ADD  CONSTRAINT [DF_Removal_date]  DEFAULT (CONVERT([date],getdate())) FOR [date]
 GO
 ALTER TABLE [dbo].[Rigs] ADD  CONSTRAINT [DF_Rigs_date_in]  DEFAULT (CONVERT([date],getdate())) FOR [date_in]
 GO
@@ -368,10 +386,25 @@ REFERENCES [dbo].[Positions] ([id])
 GO
 ALTER TABLE [dbo].[PositionDetails] CHECK CONSTRAINT [FK_PositionDetails_Positions]
 GO
+ALTER TABLE [dbo].[Removal]  WITH CHECK ADD  CONSTRAINT [FK_Removal_Boreholes] FOREIGN KEY([BH_id])
+REFERENCES [dbo].[Boreholes] ([id])
+GO
+ALTER TABLE [dbo].[Removal] CHECK CONSTRAINT [FK_Removal_Boreholes]
+GO
+ALTER TABLE [dbo].[Removal]  WITH CHECK ADD  CONSTRAINT [FK_Removal_Teams] FOREIGN KEY([team_id])
+REFERENCES [dbo].[Teams] ([id])
+GO
+ALTER TABLE [dbo].[Removal] CHECK CONSTRAINT [FK_Removal_Teams]
+GO
 ALTER TABLE [dbo].[Rigs]  WITH CHECK ADD  CONSTRAINT [FK_Rigs_Types] FOREIGN KEY([type_id])
 REFERENCES [dbo].[Types] ([id])
 GO
 ALTER TABLE [dbo].[Rigs] CHECK CONSTRAINT [FK_Rigs_Types]
+GO
+ALTER TABLE [dbo].[Teams]  WITH CHECK ADD  CONSTRAINT [FK_Teams_Drillers] FOREIGN KEY([leader_id])
+REFERENCES [dbo].[Drillers] ([id])
+GO
+ALTER TABLE [dbo].[Teams] CHECK CONSTRAINT [FK_Teams_Drillers]
 GO
 ALTER TABLE [dbo].[Boreholes]  WITH CHECK ADD  CONSTRAINT [CK_Boreholes_depth_1] CHECK  (([depth_1]>(0)))
 GO
@@ -408,6 +441,16 @@ GO
 ALTER TABLE [dbo].[WorkHours]  WITH CHECK ADD  CONSTRAINT [CK_WorkHours] CHECK  (([hours]=(12) OR [hours]=(11) OR [hours]=(10) OR [hours]=(9) OR [hours]=(8)))
 GO
 ALTER TABLE [dbo].[WorkHours] CHECK CONSTRAINT [CK_WorkHours]
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'FK_drillers' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'Attendance', @level2type=N'COLUMN',@level2name=N'driller_id'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'point number' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'Boreholes', @level2type=N'COLUMN',@level2name=N'Station'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'Boreholes', @level2type=N'COLUMN',@level2name=N'depth_1'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'Boreholes', @level2type=N'COLUMN',@level2name=N'depth_2'
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'Boreholes', @level2type=N'COLUMN',@level2name=N'depth_3'
 GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'between 8 and 12' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'WorkHours', @level2type=N'CONSTRAINT',@level2name=N'CK_WorkHours'
 GO
