@@ -1,20 +1,20 @@
-from _ast import pattern
 from tkinter import ttk
 from datetime import date, timedelta
 import ttkbootstrap as tb
 import pyodbc
 import re
+import tkintermapview
 
 from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
 from ttkbootstrap.tableview import Tableview
-
+from PIL import Image, ImageTk
 
 class Management:
     def __init__(self, root):
         self.window = root
         self.window.title("Drilling Management Studio")
-        self.window.geometry("1200x800")
+        self.window.geometry("1200x900")
 
         # configuration
         self.driver = [x for x in pyodbc.drivers() if x.endswith('SQL Server')]
@@ -36,29 +36,42 @@ class Management:
         self.top_frame_buttons = tb.Frame(self.top_frame)
         self.top_frame_buttons.grid(row=0, column=0, sticky=W)
 
-        self.top_frame_info = tb.Label(self.top_frame, text="Zaloguj się do bazy danych", font=('Lato', 12), bootstyle='warning')
+        self.top_frame_info = tb.Label(self.top_frame, text="Zaloguj się do bazy danych", font=('Lato', 12),
+                                       bootstyle='warning')
         self.top_frame_info.grid(row=0, column=1, padx=5, pady=5, sticky=W)
 
         self.top_frame_label = tb.Label(self.top_frame, text="DrillingManagementStudio", font=('lato', 20))
         self.top_frame_label.grid(row=0, column=2, padx=5, pady=5, sticky=E)
 
         # top frame buttons
-        self.connect_button = tb.Button(self.top_frame_buttons, text="Połącz", command=self.connect, bootstyle='success-link', takefocus=1).grid(row=0, column=0, padx=5, pady=5)
+        self.connect_button = tb.Button(self.top_frame_buttons, text="Połącz", command=self.connect, bootstyle='success-link', takefocus=1)
+        self.connect_button.grid(row=0, column=0, padx=5, pady=5)
         self.employee_button = tb.Menubutton(self.top_frame_buttons, text="Ludzie", bootstyle='success, outline', takefocus=1)
-        self.rigs_button = tb.Menubutton(self.top_frame_buttons, text="Sprzęt", bootstyle='success, outline', takefocus=1).grid(row=0, column=2, padx=5, pady=5)
-        self.work_button = tb.Menubutton(self.top_frame_buttons, text="Produkcja", bootstyle='success, outline', takefocus=1).grid(row=0, column=3, padx=5, pady=5)
+        self.employee_button.grid(row=0, column=1, padx=5, pady=5)
+        self.rigs_button = tb.Menubutton(self.top_frame_buttons, text="Sprzęt", bootstyle='success, outline', takefocus=1)
+        self.rigs_button.grid(row=0, column=2, padx=5, pady=5)
+        self.work_button = tb.Menubutton(self.top_frame_buttons, text="Produkcja", bootstyle='success, outline', takefocus=1)
+        self.work_button.grid(row=0, column=3, padx=5, pady=5)
 
         # localization
         self.employee_button.grid(row=0, column=1, padx=5, pady=5)
-
+        
         # menus
+        # menu employee_button
         self.employee_button_menu = tb.Menu(self.employee_button)
         self.employee_button_menu.add_command(label="Przeglądaj", font=('lato', 10), command=self.employees)
         self.employee_button_menu.add_command(label="Obecność", font=('lato', 10), command=self.attendance_view)
         self.employee_button_menu.add_command(label="Brygady", font=('lato', 10), command=self.teams_view)
-
         # setting menu to menu button
         self.employee_button['menu'] = self.employee_button_menu
+
+        # menu work_button
+        self.work_button_menu = tb.Menu(self.work_button)
+        self.work_button_menu.add_command(label='Przeglądaj', font=('lato', 10), command=self.theory_view)
+        self.work_button_menu.add_command(label='Dodaj', font=('lato', 10), command=self.insert_work_view)
+        self.work_button_menu.add_command(label='Raporty', font=('lato', 10), command=self.work_reports_view)
+        # setting menu to work_button
+        self.work_button['menu'] = self.work_button_menu
 
         # separator
         self.sep = tb.Separator(root, orient=HORIZONTAL, bootstyle='success')
@@ -84,8 +97,10 @@ class Management:
         self.report = tb.Label(self.info_frame_in, text='', font=('Lato', 15))
         self.report.pack(fill=BOTH, expand=1, ipadx=10, ipady=10)
 
-        # default positions for search
-  #      self.positions = ['Wszyscy', 'Brygadziści']
+        # map icons
+        self.star = ImageTk.PhotoImage(Image.open('gwiaz.png').resize((15, 15)))
+        self.star_done = ImageTk.PhotoImage(Image.open('gwiaz_done.png').resize((12, 12)))
+        self.circle = ImageTk.PhotoImage(Image.open('kolko.png').resize((15, 15)))
 
 
     def employees_view(self, event):
@@ -123,7 +138,6 @@ class Management:
         employee_view_label = tb.Label(self.label_frame_in, text='Pracownicy: ', font=('Lato', 12))
         employee_view_label.grid(row=0, column=0, columnspan=2, sticky=W, padx=10, pady=10)
         self.report.config(text='', bootstyle='success')
-
 
         # positions in database
         self.positions = ['Wszyscy', 'Brygadziści']
@@ -209,8 +223,9 @@ class Management:
                 self.report.config(text='Istnieje już pracownik o podanym imieniu i nazwisku', bootstyle='warning')
 
                 # message box for manage existing same name in database
-                mb = Messagebox.show_question('Istnnieje już pracownik o takim samym imieniu i nazwisku.\n Chesz dodać ponownie?',
-                                          'Uwaga', buttons=['Nie dodawaj: pirmary', 'Mimo to dodaj: danger'])
+                mb = Messagebox.show_question('Istnnieje już pracownik o takim samym imieniu i nazwisku.'
+                                              '\n Chesz dodać ponownie?','Uwaga',
+                                              buttons=['Nie dodawaj: pirmary', 'Mimo to dodaj: danger'])
                 if mb == 'Mimo to dodaj':
                    # selected_position = self.cur.execute(f"select id from positions "
                    #                                      f"where position = '{v_position}'").fetchone()[0]
@@ -221,8 +236,6 @@ class Management:
                     self.cur.execute(add_qra)
                     self.cur.commit()
             else:
-              #  selected_position = self.cur.execute(f"select id from positions "
-              #                                       f"where position = '{v_position}'").fetchone()[0]
                 if v_phone:
                     add_qra = f"exec p_add_driller {v_firstname}, {v_lastname}, {selected_position}, '{v_phone}'"
                 else:
@@ -290,6 +303,7 @@ class Management:
         attendance_list = self.cur.execute(f"select * from VW_attendance_report3 order by driller_id;").fetchall()
         attendance_header = [column[0] for column in self.cur.description]
 
+
         # show table with attendance in current month
         attendance_tab = Tableview(
             master=self.tab_frame_in,
@@ -301,54 +315,162 @@ class Management:
             bootstyle='success')
         attendance_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
 
+        self.attendance_label_frame = tb.LabelFrame(self.entry_frame_in, text='Obecność')
+        self.attendance_label_frame.pack(fill=BOTH, expand=1, padx=5)
         self.check_attendance()
-        self.buttons_attendance()
+        self.button_attendance()
 
     def check_attendance(self):
         attendance_employees = self.cur.execute('Select id, driller from vw_drillers order by id;').fetchall()
-        attendance_dict = {}
+        self.attendance_dict = {}
 
         print(attendance_employees)
         for i in attendance_employees:
             print(i)
-            attendance_dict[i[0]] = 0
+            self.attendance_dict[i[0]] = 1
             self.attendance_checkbox(i)
-        print(attendance_dict)
+        print(self.attendance_dict)
 
     def attendance_checkbox(self, employee):
-        checkbox_var = tb.IntVar(value=0)
-        checkbox = tb.Checkbutton(self.entry_frame_in, text=f'{employee[0]} {employee[1]}', variable=checkbox_var, command=lambda v=employee: self.on_checkbox_change_update(v, checkbox_var))
+        checkbox_var = tb.IntVar(value=1)
+        checkbox = tb.Checkbutton(self.attendance_label_frame, text=f'{employee[0]} {employee[1]}', variable=checkbox_var,
+                                  command=lambda v=employee: self.on_checkbox_change_updater(v, checkbox_var))
         checkbox.pack(padx=10, anchor=W)
 
-    def on_checkbox_change_update(self, variable, value):
+    def on_checkbox_change_updater(self, variable, value):
+        '''function to update attendance dictionary'''
         print(f'pracownik {variable} jest {value.get()}')
+        self.attendance_dict[variable[0]] = value.get()
 
 
-    def buttons_attendance(self):
-        self.in_date = tb.DateEntry(self.entry_frame_in, bootstyle='success')
-        attendace_button = tb.Button(self.entry_frame_in, text='Wprowadź obecność', command=self.attendance_insert, bootstyle='success')
-        self.in_date.pack(padx=10, pady=10, side=LEFT)
-        attendace_button.pack(padx=10, pady=10, side=LEFT)
+    def button_attendance(self):
+        self.in_date = tb.DateEntry(self.attendance_label_frame, bootstyle='success', dateformat='%Y-%m-%d', width=10)
+        # dateformat - independence from system settings
+        attendace_button = tb.Button(self.attendance_label_frame, text='Wprowadź obecność', command=self.attendance_insert,
+                                     bootstyle='success')
+        self.in_date.pack(padx=10, pady=5, side=LEFT)
+        attendace_button.pack(padx=10, pady=5, side=LEFT)
 
     def attendance_insert(self):
         '''insert attendance into the database'''
-        d, m, y = self.in_date.entry.get().split(sep='.')
+        date_in = self.in_date.entry.get()
+        y, m, d = self.in_date.entry.get().split(sep='-')
         date_in = date(int(y), int(m), int(d))
         if date_in > date.today():
             mb = Messagebox.show_error('Podaj prawidłową datę!')
             print('Wprowadź prawidłową datę!')
         else:
             print(f'wybrana data: {date_in}')
-
+            print(self.attendance_dict)
+            attendance_list = []
+            for key, value in self.attendance_dict.items():
+                attendance_list.append((key, date_in.strftime('%Y-%m-%d'), value))
+            print(attendance_list)
+            self.cur.executemany('insert into attendance (driller_id, date, is_present) VALUES (?,?,?)', attendance_list)
+            self.con.commit()
 
 
     def teams_view(self):
         ''' Function to display the teams '''
         self.clear_screen(self.label_frame_in)
-        self.employee_view_label = tb.Label(self.label_frame_in, text='Zespoły: Funkcja niedostępna', font=('Lato', 12)).grid(row=0, column=0, columnspan=2, sticky=W, padx=10, pady=10)
+        self.employee_view_label = tb.Label(self.label_frame_in, text='Zespoły: Funkcja niedostępna', font=('Lato', 12))
+        self.employee_view_label.grid(row=0, column=0, columnspan=2, sticky=W, padx=10, pady=10)
         self.clear_screen(self.tab_frame_in)
         self.clear_screen(self.entry_frame_in)
         self.report.config(text='', bootstyle='success')
+
+
+    def choose_map_server(self, event):
+        '''function to change map tiling server'''
+        new_map = self.map_option_combo.get()
+        if new_map == "OpenStreetMap":
+            self.map_widget.set_tile_server("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png")
+        elif new_map == "Google normal":
+            self.map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=m&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
+        elif new_map == "Google satellite":
+            self.map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
+
+
+    def theory_view(self):
+        '''Display theory when select theory from menu work_menu'''
+        self.clear_screen(self.tab_frame_in)
+        self.clear_screen(self.entry_frame_in)
+        self.clear_screen(self.label_frame_in)
+        theory_view_label = tb.Label(self.label_frame_in, text='Przegląd punktów: ', font=('Lato', 12))
+        theory_view_label.pack(side=LEFT, padx=10, pady=10)
+        self.report.config(text='', bootstyle='success')
+
+        # select tile server:
+        self.map_option_combo = tb.Combobox(self.label_frame_in, bootstyle='success',
+                                            values=["OpenStreetMap", "Google normal", "Google satellite"])
+        self.map_option_combo.pack(padx=10, pady=10, side=RIGHT)
+        self.map_option_combo.current(0)
+        self.map_option_combo.bind("<<ComboboxSelected>>", self.choose_map_server)
+
+        self.map_label = tb.Label(self.label_frame_in, text="Wybierz serwer mapowy:", anchor="w", font=('lato', 12))
+        self.map_label.pack(padx=10, pady=10, side=RIGHT)
+
+        min_lat, max_lat, min_long, max_long = self.cur.execute('select * from vw_map_range').fetchone()
+        print(min_lat, max_lat, min_long, max_long)
+        # create map widged in tab_frame_in
+        self.map_widget = tkintermapview.TkinterMapView(self.tab_frame_in, height=450)
+        self.map_widget.pack(fill=BOTH, expand=1, padx=5, pady=5)
+        self.map_widget.fit_bounding_box((max_lat, min_long), (min_lat, max_long))
+
+        # tab with all points in database
+
+        theory_all = self.cur.execute('Select * from vw_theory where drilling_date is null').fetchall()
+        header = [column[0] for column in self.cur.description]
+
+        theory_tab = Tableview(
+            master=self.entry_frame_in,
+            coldata=header,
+            rowdata=theory_all,
+            paginated=True,
+            searchable=True,
+            autofit=True,
+            bootstyle='success')
+        theory_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
+
+
+        #show points on map
+        theory_map = self.cur.execute('select * from vw_theory').fetchall()
+        for row in theory_map:
+            if row[1].strip() == 'xt' or row[1].strip() == 'xr':
+                if row[5]:
+                    self.map_widget.set_marker(row[2], row[3], text=str(row[0]), icon=self.star_done,
+                                               text_color='grey')
+                else:
+                    self.map_widget.set_marker(row[2], row[3], text=str(row[0]), icon=self.star)
+            else:
+                self.map_widget.set_marker(row[2], row[3], text=str(row[0]), icon=self.circle)
+
+
+
+
+    def insert_work_view(self):
+        '''Display window to insert daily work to database'''
+        self.clear_screen(self.tab_frame_in)
+        self.clear_screen(self.entry_frame_in)
+        self.clear_screen(self.label_frame_in)
+        insert_work_view_label = tb.Label(self.label_frame_in, text='Wprowadź dane: ', font=('Lato', 12))
+        insert_work_view_label.grid(row=0, column=0, columnspan=2, sticky=W, padx=10, pady=10)
+        self.report.config(text='', bootstyle='success')
+
+    def work_reports_view(self):
+        '''Display window with production, work reports'''
+        self.clear_screen(self.label_frame_in)
+        self.employee_view_label = tb.Label(self.label_frame_in, text='Raporty: Funkcja niedostępna', font=('Lato', 12))
+        self.employee_view_label.grid(row=0, column=0, columnspan=2, sticky=W, padx=10, pady=10)
+        self.clear_screen(self.tab_frame_in)
+        self.clear_screen(self.entry_frame_in)
+        self.report.config(text='', bootstyle='success')
+
+
+
+
+
+
 
 
 
@@ -396,6 +518,7 @@ class Management:
             except pyodbc.Error:
                 print('Bląd sterownika')
                 continue
+
 
     def clear_screen(self, container):
         '''
