@@ -22,7 +22,7 @@ class Management:
         self.database = 'u_dojurkow'
 
         self.username = '' #'u_dojurkow'
-        self.password = '' # 'HRaOhaqRHaAZ'
+        self.password = '' 
         self.phone_pattern = re.compile(r"^\d{3}-\d{3}-\d{3}$")
 
         # top frame
