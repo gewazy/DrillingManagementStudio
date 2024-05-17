@@ -15,6 +15,7 @@ class Management:
         self.window = root
         self.window.title("Drilling Management Studio")
         self.window.geometry("1200x900")
+        self.style = tb.Style(theme="darkly")
 
         # configuration
         self.driver = [x for x in pyodbc.drivers() if x.endswith('SQL Server')]
@@ -22,7 +23,7 @@ class Management:
         self.database = 'u_dojurkow'
 
         self.username = '' #'u_dojurkow'
-        self.password = '' 
+        self.password = '' # ''
         self.phone_pattern = re.compile(r"^\d{3}-\d{3}-\d{3}$")
 
         # top frame
@@ -36,11 +37,11 @@ class Management:
         self.top_frame_buttons = tb.Frame(self.top_frame)
         self.top_frame_buttons.grid(row=0, column=0, sticky=W)
 
-        self.top_frame_info = tb.Label(self.top_frame, text="Zaloguj się do bazy danych", font=('Lato', 12),
+        self.top_frame_info = tb.Label(self.top_frame, text="Zaloguj się do bazy danych", font=('Lato', 15),
                                        bootstyle='warning')
         self.top_frame_info.grid(row=0, column=1, padx=5, pady=5, sticky=W)
 
-        self.top_frame_label = tb.Label(self.top_frame, text="DrillingManagementStudio", font=('lato', 20))
+        self.top_frame_label = tb.Label(self.top_frame, text="DrillingManagementStudio", font=('lato, bold', 20))
         self.top_frame_label.grid(row=0, column=2, padx=5, pady=5, sticky=E)
 
         # top frame buttons
@@ -53,9 +54,7 @@ class Management:
         self.work_button = tb.Menubutton(self.top_frame_buttons, text="Produkcja", bootstyle='success, outline', takefocus=1)
         self.work_button.grid(row=0, column=3, padx=5, pady=5)
 
-        # localization
-        self.employee_button.grid(row=0, column=1, padx=5, pady=5)
-        
+
         # menus
         # menu employee_button
         self.employee_button_menu = tb.Menu(self.employee_button)
@@ -95,12 +94,23 @@ class Management:
 
         # info frame label
         self.report = tb.Label(self.info_frame_in, text='', font=('Lato', 15))
-        self.report.pack(fill=BOTH, expand=1, ipadx=10, ipady=10)
+        self.report.pack(fill=BOTH, expand=1, ipadx=10, ipady=10,)
+
+        # select theme:
+        self.select_theme = tb.Combobox(self.info_frame_in, bootstyle='success',
+                                        values=['darkly', 'superhero', 'solar', 'lumen'], font=('Lato', 8))
+        self.select_theme.pack(padx=5, pady=5, side=RIGHT)
+        self.select_theme_label = tb.Label(self.info_frame_in, text="Wybierz motyw: ", font=('Lato', 8), bootstyle='inverse-secondary')
+        self.select_theme_label.pack(padx=5, pady=5, side=RIGHT)
+        self.select_theme.current(0)
+        self.select_theme.bind("<<ComboboxSelected>>", lambda x: self.style.theme_use(self.select_theme.get()))
 
         # map icons
+        self.selected = [] # keeping selected marks
         self.star = ImageTk.PhotoImage(Image.open('gwiaz.png').resize((15, 15)))
-        self.star_done = ImageTk.PhotoImage(Image.open('gwiaz_done.png').resize((12, 12)))
-        self.circle = ImageTk.PhotoImage(Image.open('kolko.png').resize((15, 15)))
+        self.star_done = ImageTk.PhotoImage(Image.open('gwiaz_done.png').resize((10, 10)))
+        self.star_sel = ImageTk.PhotoImage(Image.open('gwiaz_selected.png').resize((20, 20)))
+        self.circle = ImageTk.PhotoImage(Image.open('kolko.png').resize((12, 12)))
 
 
     def employees_view(self, event):
@@ -353,7 +363,6 @@ class Management:
 
     def attendance_insert(self):
         '''insert attendance into the database'''
-        date_in = self.in_date.entry.get()
         y, m, d = self.in_date.entry.get().split(sep='-')
         date_in = date(int(y), int(m), int(d))
         if date_in > date.today():
@@ -366,8 +375,12 @@ class Management:
             for key, value in self.attendance_dict.items():
                 attendance_list.append((key, date_in.strftime('%Y-%m-%d'), value))
             print(attendance_list)
-            self.cur.executemany('insert into attendance (driller_id, date, is_present) VALUES (?,?,?)', attendance_list)
-            self.con.commit()
+            try:
+                self.cur.executemany('insert into attendance (driller_id, date, is_present) VALUES (?,?,?)', attendance_list)
+                self.con.commit()
+                self.report.config(text=f'Obecność z dnia {date_in} wprowadzona.', bootstyle='success')
+            except Exception as e:
+                self.report.config(text=f'Nieoczekiwanie pojawił się błąd: \n{e}', bootstyle='danger', wraplength=750)
 
 
     def teams_view(self):
@@ -391,46 +404,97 @@ class Management:
             self.map_widget.set_tile_server("https://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}&s=Ga", max_zoom=22)
 
 
+    def show_plan(self, event):
+        for mark in self.selected:
+            mark.delete()
+
+        team = self.show_plan_combo.get().split()[0]
+        # tab with points planet for team
+        leader_plan = self.cur.execute(f'Select * from vw_theory where drilling_date is null and Plan_brygada = {team}').fetchall()
+        header_plan = [column[0] for column in self.cur.description]
+
+        self.theory_tab.destroy()
+        self.theory_tab = Tableview(
+            master=self.entry_frame_in,
+            coldata=header_plan,
+            rowdata=leader_plan,
+            paginated=True,
+            pagesize=20,
+            searchable=True,
+            autofit=True,
+            bootstyle='success')
+        self.theory_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
+
+        # map setup
+        min_lat, max_lat, min_long, max_long = self.cur.execute(f'Select min(wgs_latitude), max(wgs_latitude), '
+                                                                f'min(wgs_longitude), max(wgs_longitude) '
+                                                                f'from vw_theory '
+                                                                f'where drilling_date is null and Plan_brygada = {team}').fetchone()
+        print(min_lat, max_lat, min_long, max_long)
+        self.map_widget.fit_bounding_box((max_lat, min_long), (min_lat, max_long))
+
+
+        for row in leader_plan:
+            self.selected.append(self.map_widget.set_marker(row[2], row[3], icon=self.star_sel))
+
+
+
+
+
     def theory_view(self):
         '''Display theory when select theory from menu work_menu'''
         self.clear_screen(self.tab_frame_in)
         self.clear_screen(self.entry_frame_in)
         self.clear_screen(self.label_frame_in)
-        theory_view_label = tb.Label(self.label_frame_in, text='Przegląd punktów: ', font=('Lato', 12))
+        theory_view_label = tb.Label(self.label_frame_in, text='Przegląd punktów. ', font=('Lato', 12))
         theory_view_label.pack(side=LEFT, padx=10, pady=10)
         self.report.config(text='', bootstyle='success')
 
-        # select tile server:
-        self.map_option_combo = tb.Combobox(self.label_frame_in, bootstyle='success',
-                                            values=["OpenStreetMap", "Google normal", "Google satellite"])
-        self.map_option_combo.pack(padx=10, pady=10, side=RIGHT)
+        # select tile server: ====================================================================
+        self.map_option_combo = tb.Combobox(self.label_frame_in, bootstyle='success', font=('lato', 9),
+                                            values=["OpenStreetMap", "Google normal", "Google satellite"], width=15)
+        self.map_option_combo.pack(padx=5, pady=10, side=RIGHT)
         self.map_option_combo.current(0)
         self.map_option_combo.bind("<<ComboboxSelected>>", self.choose_map_server)
 
-        self.map_label = tb.Label(self.label_frame_in, text="Wybierz serwer mapowy:", anchor="w", font=('lato', 12))
-        self.map_label.pack(padx=10, pady=10, side=RIGHT)
+        self.map_label = tb.Label(self.label_frame_in, text="Wybierz serwer mapowy:", anchor="w", font=('lato', 9))
+        self.map_label.pack(padx=5, pady=10, side=RIGHT)
+
+        # show plan combo =======================================================================
+        driller_with_plan = self.cur.execute('select distinct team_id,  driller from VW_Planned_points pp join vw_drillers d on pp.Brygadzista = d.id;').fetchall()
+
+        self.show_plan_combo = tb.Combobox(self.label_frame_in, bootstyle='success', font=('lato', 9),
+                                           values=[(i[0], i[1]) for i in driller_with_plan], width=15)
+        self.show_plan_combo.pack(padx=5, pady=10, side=RIGHT)
+        self.show_plan_combo.current(0)
+        self.show_plan_combo.bind("<<ComboboxSelected>>", self.show_plan)
+        self.show_label = tb.Label(self.label_frame_in, text="Pokaż plan:", anchor="w", font=('lato', 9))
+        self.show_label.pack(padx=5, pady=10, side=RIGHT)
+
 
         min_lat, max_lat, min_long, max_long = self.cur.execute('select * from vw_map_range').fetchone()
         print(min_lat, max_lat, min_long, max_long)
+
         # create map widged in tab_frame_in
-        self.map_widget = tkintermapview.TkinterMapView(self.tab_frame_in, height=450)
-        self.map_widget.pack(fill=BOTH, expand=1, padx=5, pady=5)
+        self.map_widget = tkintermapview.TkinterMapView(self.tab_frame_in, height=400, corner_radius=10)
+        self.map_widget.pack(fill=BOTH, expand=1, padx=10, pady=5)
         self.map_widget.fit_bounding_box((max_lat, min_long), (min_lat, max_long))
 
-        # tab with all points in database
 
+        # tab with all points in database
         theory_all = self.cur.execute('Select * from vw_theory where drilling_date is null').fetchall()
         header = [column[0] for column in self.cur.description]
 
-        theory_tab = Tableview(
+        self.theory_tab = Tableview(
             master=self.entry_frame_in,
             coldata=header,
             rowdata=theory_all,
             paginated=True,
+            pagesize=20,
             searchable=True,
             autofit=True,
             bootstyle='success')
-        theory_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
+        self.theory_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
 
 
         #show points on map
@@ -465,10 +529,6 @@ class Management:
         self.clear_screen(self.tab_frame_in)
         self.clear_screen(self.entry_frame_in)
         self.report.config(text='', bootstyle='success')
-
-
-
-
 
 
 
@@ -531,6 +591,6 @@ class Management:
 
 # The main function, start the program.
 if __name__ == "__main__":
-    root = tb.Window(themename='darkly')
+    root = tb.Window()
     obj = Management(root)
     root.mainloop()
