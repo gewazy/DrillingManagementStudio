@@ -310,7 +310,7 @@ class Management:
         self.report.config(text='', bootstyle='success')
 
         # attendance data
-        attendance_list = self.cur.execute(f"select * from VW_attendance_report3 order by driller_id;").fetchall()
+        attendance_list = self.cur.execute(f"select * from VW_attendance_report5 order by driller_id;").fetchall()
         attendance_header = [column[0] for column in self.cur.description]
 
 
@@ -324,6 +324,7 @@ class Management:
             autofit=True,
             bootstyle='success')
         attendance_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
+
 
         self.attendance_label_frame = tb.LabelFrame(self.entry_frame_in, text='Obecność')
         self.attendance_label_frame.pack(fill=BOTH, expand=1, padx=5)
@@ -413,7 +414,10 @@ class Management:
         leader_plan = self.cur.execute(f'Select * from vw_theory where drilling_date is null and Plan_brygada = {team}').fetchall()
         header_plan = [column[0] for column in self.cur.description]
 
-        self.theory_tab.destroy()
+        try:
+            self.theory_tab.destroy()
+        except AttributeError:
+            pass
         self.theory_tab = Tableview(
             master=self.entry_frame_in,
             coldata=header_plan,
@@ -464,7 +468,7 @@ class Management:
         driller_with_plan = self.cur.execute('select distinct team_id,  driller from VW_Planned_points pp join vw_drillers d on pp.Brygadzista = d.id;').fetchall()
 
         self.show_plan_combo = tb.Combobox(self.label_frame_in, bootstyle='success', font=('lato', 9),
-                                           values=[(i[0], i[1]) for i in driller_with_plan], width=15)
+                                           values=[f"{i[0]} {i[1]}" for i in driller_with_plan], width=15)
         self.show_plan_combo.pack(padx=5, pady=10, side=RIGHT)
         self.show_plan_combo.current(0)
         self.show_plan_combo.bind("<<ComboboxSelected>>", self.show_plan)
@@ -474,6 +478,7 @@ class Management:
 
         min_lat, max_lat, min_long, max_long = self.cur.execute('select * from vw_map_range').fetchone()
         print(min_lat, max_lat, min_long, max_long)
+
 
         # create map widged in tab_frame_in
         self.map_widget = tkintermapview.TkinterMapView(self.tab_frame_in, height=400, corner_radius=10)
@@ -485,6 +490,10 @@ class Management:
         theory_all = self.cur.execute('Select * from vw_theory where drilling_date is null').fetchall()
         header = [column[0] for column in self.cur.description]
 
+        try:
+            self.theory_tab.destroy()
+        except AttributeError:
+            pass
         self.theory_tab = Tableview(
             master=self.entry_frame_in,
             coldata=header,
@@ -495,6 +504,7 @@ class Management:
             autofit=True,
             bootstyle='success')
         self.theory_tab.pack(fill=BOTH, expand=1, padx=5, pady=5)
+
 
 
         #show points on map
